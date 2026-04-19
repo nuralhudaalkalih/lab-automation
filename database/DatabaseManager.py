@@ -2,13 +2,14 @@ import sqlite3
 class DatabaseManager:
     def __init__(self, db_path="lab.db"):
         self.db_path = db_path
-        self.connection= sqlite3.connect(self.db_path)
-        self.connection.row_factory=sqlite3.Row #ACCESS TO COLUMNS BY NAME instead of index
-        self.cursor=self.connection.cursor() #execute sql commands
+        self.conn= sqlite3.connect(self.db_path)
+        self.conn.execute("PRAGMA foreign_keys = ON;") # Enable foreign key constraints which are off by default in SQLite
+        self.conn.row_factory=sqlite3.Row #ACCESS TO COLUMNS BY NAME instead of index
+        self.cursor=self.conn.cursor() #execute sql commands
         self.create_tables()
     def create_tables(self):
         # executescript allows us to execute multiple SQL statements at once
-       self.cursor.executescript("""
+        self.cursor.executescript("""
             -- 'role' is constrained to only two valid strings.
             CREATE TABLE IF NOT EXISTS Users (
                 user_id   INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -45,12 +46,19 @@ class DatabaseManager:
                 result_value TEXT,
                 FOREIGN KEY (sample_id) REFERENCES Samples(sample_id)
                     ON DELETE CASCADE,
+                --cascasde delete: if a parent row is deleted all choldren rows are deleted as well
                 FOREIGN KEY (test_id)   REFERENCES Tests(test_id)
                     ON DELETE RESTRICT
+                -- restrict: prevents the deletion of a parent row if it has any child rows referencing it
             );
         """)
         self.conn.commit()
  
 
+ 
     def close(self):
-        self.connection.close()
+        self.conn.close()
+ 
+    def get_db_path(self):
+        """Returns the absolute path of the database file (useful for debugging)."""
+        return os.path.abspath(self.db_path)
