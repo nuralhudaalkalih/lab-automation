@@ -122,7 +122,13 @@ LABRATORYAUTOMATION/
 │   └── ResultDAO.py           # CRUD for the Results table (with JOINs)
 │
 ├── models/
-│   └── models.py              # User, Admin, Technician, Sample, Test, Result classes
+│   └── Admin.py 
+│   └── Technician.py
+│   └── User.py
+│   └── Sample.py
+│   └── Test.py
+│   └── Result.py     
+│
 │
 ├── controllers/
 │   ├── AuthController.py      # Login, logout, user management, session
